@@ -2,8 +2,8 @@
 const traverse = require("@babel/traverse").default;
 const babelParser = require("@babel/parser");
 const generate = require("@babel/generator").default;
+const babel = require("@babel/core");
 
-const babel = require("babel-core");
 // const path = require('path');
 // const fs = require('fs')
 
@@ -18,7 +18,7 @@ const arrowFun = `const vv=()=>{
 
 const classSimple = `class Example {}`;
 
-const codeStr = classSimple;
+const codeStr = baseStr;
 
 const ast = babelParser.parse(codeStr);
 console.log("parser------ast", ast);
@@ -48,10 +48,13 @@ const output = generate(
 
 console.log("产出---", output);
 
-return;
-let result = babel.transform(codeStr);
-
-console.log("转换前：" + result.code);
+let result = babel.transform(codeStr, {
+  plugins: [
+    "@babel/plugin-transform-arrow-functions",
+    "@babel/plugin-transform-classes",
+  ],
+});
+console.log("转换前：", result);
 
 const transAst = (ast) => {
   let newAst = JSON.parse(JSON.stringify(ast));
@@ -92,6 +95,6 @@ console.log("ast:", result);
 // console.log("ast---------:", babel.transformFromAst(result.ast));
 
 // 将新的ast转换成代码
-let code = babel.transformFromAst(transAst(result.ast)).code;
+let code = babel.transformFromAst(transAst(babel.parse(result.code))).code;
 
 console.log("转换后：" + code);
